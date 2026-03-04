@@ -1,0 +1,14 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# SQLite Database
+resources.db
+resources.db-journal
+resources.db-wal
+resources.db-shm
