@@ -15,7 +15,6 @@ app = FastAPI()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
-# Conexão com o Banco de Dados
 def get_db():
     conn = sqlite3.connect("resources.db")
     conn.row_factory = sqlite3.Row
@@ -24,20 +23,19 @@ def get_db():
 
 # Inicializar Banco de Dados
 with get_db() as conn:
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS resources (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT,
-            type TEXT NOT NULL,
-            url TEXT,
-            tags TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS resources ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "title TEXT NOT NULL, "
+        "description TEXT, "
+        "type TEXT NOT NULL, "
+        "url TEXT, "
+        "tags TEXT, "
+        "created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+        ")"
+    )
 
 
-# Modelos para Validação (Pydantic)
 class Resource(BaseModel):
     titulo: str
     descricao: str
@@ -51,19 +49,17 @@ class AIRequest(BaseModel):
     tipo: str
 
 
-# Rota de Observabilidade / Health
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "timestamp": time.time()}
 
 
-# Listar Recursos (GET)
 @app.get("/api/resources")
 def get_resources(page: int = 1, limit: int = 10):
     offset = (page - 1) * limit
     with get_db() as conn:
         resources = conn.execute(
-            "SELECT * FROM resources ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            "SELECT * FROM resources " "ORDER BY created_at DESC LIMIT ? OFFSET ?",
             (limit, offset),
         ).fetchall()
 
@@ -94,13 +90,14 @@ def get_resources(page: int = 1, limit: int = 10):
         }
 
 
-# Criar Recurso (POST)
 @app.post("/api/resources")
 def create_resource(resource: Resource):
     with get_db() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO resources (title, description, type, url, tags) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO resources "
+            "(title, description, type, url, tags) "
+            "VALUES (?, ?, ?, ?, ?)",
             (
                 resource.titulo,
                 resource.descricao,
@@ -113,12 +110,13 @@ def create_resource(resource: Resource):
         return {"id": resource_id, **resource.dict()}
 
 
-# Atualizar Recurso (PUT)
 @app.put("/api/resources/{resource_id}")
 def update_resource(resource_id: int, resource: Resource):
     with get_db() as conn:
         conn.execute(
-            "UPDATE resources SET title = ?, description = ?, type = ?, url = ?, tags = ? WHERE id = ?",
+            "UPDATE resources SET "
+            "title = ?, description = ?, type = ?, url = ?, tags = ? "
+            "WHERE id = ?",
             (
                 resource.titulo,
                 resource.descricao,
@@ -131,7 +129,6 @@ def update_resource(resource_id: int, resource: Resource):
         return {"id": resource_id, **resource.dict()}
 
 
-# Deletar Recurso (DELETE)
 @app.delete("/api/resources/{resource_id}")
 def delete_resource(resource_id: int):
     with get_db() as conn:
@@ -139,16 +136,17 @@ def delete_resource(resource_id: int):
         return {"sucesso": True}
 
 
-# Assistente IA (POST)
 @app.post("/api/ai/generate")
 def generate_ai(req: AIRequest):
     start_time = time.time()
-    prompt = f"""
-        Você é um Assistente Pedagógico. 
-        Gere uma descrição educacional concisa (máximo de 2 frases) e 3 tags relevantes para um recurso de aprendizagem.
-        Título do Recurso: "{req.titulo}"
-        Tipo do Recurso: "{req.tipo}"
-    """
+
+    prompt = (
+        "Você é um Assistente Pedagógico.\n"
+        "Gere uma descrição educacional concisa (máximo de 2 frases) "
+        "e 3 tags relevantes para um recurso de aprendizagem.\n"
+        f'Título do Recurso: "{req.titulo}"\n'
+        f'Tipo do Recurso: "{req.tipo}"'
+    )
 
     try:
         response = client.models.generate_content(
@@ -172,7 +170,6 @@ def generate_ai(req: AIRequest):
 
         latency_ms = round((time.time() - start_time) * 1000, 2)
 
-        # Log Estruturado
         print(
             json.dumps(
                 {
