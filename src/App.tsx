@@ -1,23 +1,26 @@
-import { useState, useEffect } from 'react';
-import { Recurso } from './types';
-import { api } from './services/api';
-import ListaRecursos from './components/ResourceList';
-import FormularioRecurso from './components/ResourceForm';
-import { Plus, BookOpen, LayoutGrid } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from "react";
+import { Recurso } from "./types";
+import { api } from "./services/api";
+import ListaRecursos from "./components/ResourceList";
+import FormularioRecurso from "./components/ResourceForm";
+import { Plus, BookOpen, LayoutGrid } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
   const [recursos, setRecursos] = useState<Recurso[]>([]);
   const [formularioAberto, setFormularioAberto] = useState(false);
-  const [recursoEmEdicao, setRecursoEmEdicao] = useState<Recurso | undefined>(undefined);
+  const [recursoEmEdicao, setRecursoEmEdicao] = useState<Recurso | undefined>(
+    undefined,
+  );
   const [carregando, setCarregando] = useState(true);
 
   const buscarRecursos = async () => {
     try {
       const resposta = await api.obterRecursos();
-      setRecursos(resposta.dados);
+      setRecursos(resposta.dados || []);
     } catch (erro) {
-      console.error('Falha ao buscar recursos', erro);
+      console.error("Falha ao buscar recursos", erro);
+      setRecursos([]);
     } finally {
       setCarregando(false);
     }
@@ -33,7 +36,7 @@ export default function App() {
   };
 
   const lidarComExclusao = async (id: number) => {
-    if (confirm('Tem certeza de que deseja excluir este recurso?')) {
+    if (confirm("Tem certeza de que deseja excluir este recurso?")) {
       await api.deletarRecurso(id);
       buscarRecursos();
     }
@@ -53,7 +56,9 @@ export default function App() {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
               <BookOpen className="w-5 h-5" />
             </div>
-            <h1 className="text-xl font-semibold tracking-tight text-gray-900">Plataforma Educativa</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-gray-900">
+              Plataforma Educativa
+            </h1>
           </div>
           <button
             onClick={() => {
@@ -78,9 +83,16 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
             >
               <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-                <button onClick={() => setFormularioAberto(false)} className="hover:text-gray-900">Recursos</button>
+                <button
+                  onClick={() => setFormularioAberto(false)}
+                  className="hover:text-gray-900"
+                >
+                  Recursos
+                </button>
                 <span>/</span>
-                <span className="text-gray-900 font-medium">{recursoEmEdicao ? 'Editar' : 'Criar'} Recurso</span>
+                <span className="text-gray-900 font-medium">
+                  {recursoEmEdicao ? "Editar" : "Criar"} Recurso
+                </span>
               </div>
               <FormularioRecurso
                 dadosIniciais={recursoEmEdicao}
@@ -104,7 +116,7 @@ export default function App() {
                   {recursos.length} itens
                 </span>
               </div>
-              
+
               {carregando ? (
                 <div className="flex justify-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>

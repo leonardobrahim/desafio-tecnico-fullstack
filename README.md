@@ -1,67 +1,98 @@
-# Plataforma Educativa
+# Hub Inteligente de Recursos Educacionais 🧠📚
 
-Sistema de gerenciamento de recursos educacionais com assistência de Inteligência Artificial.
+Uma aplicação Fullstack desenvolvida para o gerenciamento de materiais didáticos, contando com o recurso "Smart Assist" movido por Inteligência Artificial para sugestão automática de descrições e categorizações.
 
-## Tecnologias Utilizadas
+## 🚀 Tecnologias Utilizadas
 
-- **Frontend**: React, Tailwind CSS, Lucide React, Framer Motion
-- **Backend**: Node.js, Express, Better SQLite3
-- **IA**: Google Gemini API
-- **Linguagem**: TypeScript
+**Frontend:**
 
-## Pré-requisitos
+- React (SPA) + Vite
+- TypeScript
+- Tailwind CSS + Lucide React (Ícones)
+- Tratamento de estados de carregamento (Loading state para IA)
 
-- Node.js (versão 18 ou superior)
-- npm (gerenciador de pacotes do Node)
+**Backend:**
 
-## Como Rodar Localmente
+- Python + FastAPI (Requisito: Opção A)
+- Pydantic (Validação de dados)
+- SQLite (Banco de dados leve e embutido)
 
-1. **Clone o repositório**
+**Inteligência Artificial:**
 
-   ```bash
-   git clone https://github.com/leonardobrahim/desafio-tecnico-fullstack.git
-   ```
+- Google Gemini API (gemini-2.5-flash)
+- Prompt Engineering focado no papel de "Assistente Pedagógico"
 
-2. **Instale as dependências**:
-   Abra o terminal na pasta raiz do projeto e execute:
+**DevOps & Observabilidade (Diferenciais Implementados):**
 
-   ```bash
-   npm install
-   ```
+- **Logs Estruturados:** Registro de requisições da IA incluindo uso, latência e título do recurso.
+- **Health Check:** Endpoint `/api/health` para monitoramento.
+- **Integração Contínua (CI):** Pipeline no GitHub Actions rodando `flake8` e `black` para garantir a padronização do código Python a cada push.
 
-3. **Configure as Variáveis de Ambiente**:
-   Crie um arquivo `.env` na raiz do projeto (você pode copiar o `.env.example`):
+---
 
-   ```bash
-   cp .env.example .env
-   ```
+## ⚙️ Como executar o projeto localmente
 
-   Edite o arquivo `.env` e adicione sua chave da API do Google Gemini:
+### Pré-requisitos
 
-   ```env
-   GEMINI_API_KEY="sua_chave_api_aqui"
-   ```
+- Node.js (v18+)
+- Python (3.9+)
+- Chave de API do Google Gemini
 
-   > Você pode obter uma chave gratuita em: https://aistudio.google.com/app/apikey
+### Passo 1: Configurar Variáveis de Ambiente
 
-4. **Inicie a Aplicação**:
-   Execute o comando:
+Na raiz do projeto, crie um arquivo `.env` (adicione-o ao `.gitignore` para não vazar sua chave) e insira:
 
-   ```bash
-   npm run dev
-   ```
+```env
+GEMINI_API_KEY="sua_chave_de_api_aqui"
+```
 
-5. **Acesse no Navegador**:
-   A aplicação estará rodando em: `http://localhost:3000`
+### Passo 2: Rodar o Backend (Python/FastAPI)
 
-## Estrutura do Projeto
+Abra um terminal na raiz do projeto e execute:
 
-- `/src`: Código fonte do Frontend (React)
-- `/server.ts`: Código fonte do Backend (Express) e integração com IA
-- `/resources.db`: Banco de dados SQLite (criado automaticamente ao iniciar)
+# Crie e ative o ambiente virtual
 
-## Funcionalidades
+```bash
+python -m venv venv
+source venv/bin/activate  # No Windows use: venv\Scripts\activate
+```
 
-- **Listagem de Recursos**: Visualize todos os materiais cadastrados.
-- **Cadastro Inteligente**: Use o botão "Gerar com IA" para preencher automaticamente a descrição e tags baseadas no título.
-- **Gerenciamento**: Edite ou exclua recursos facilmente.
+# Instale as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+# Inicie o servidor (Rodará na porta 8000)
+
+```bash
+uvicorn main:app --reload
+```
+
+### Passo 3: Rodar o Frontend (React/Vite)
+
+Abra um segundo terminal na raiz do projeto e execute:
+
+# Instale as dependências do Node
+
+```bash
+npm install
+```
+
+# Inicie o servidor de desenvolvimento (Rodará na porta 5173)
+
+```bash
+npm run dev
+```
+
+Acesse http://localhost:5173 no seu navegador. O Vite está configurado com um proxy que redireciona automaticamente as chamadas /api para o backend em Python.
+
+## 💡 Funcionalidades
+
+**CRUD Completo:**
+
+- Criação, leitura (com suporte a paginação na API), atualização e exclusão de recursos.
+
+**mart Assist:**
+
+- Integração com IA para gerar descrições e tags automaticamente com base no título e tipo do material, retornando dados em JSON estrito.
